@@ -1,10 +1,14 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 //middleware
 const notFound = require('./middlewares/notFound');
 const handleErrors = require('./middlewares/handleErrors');
+
+
+//routers
+const moviesRouter = require('./routers/movies');
 
 //middlewares per asset statici
 app.use(express.static('public'));
@@ -14,10 +18,13 @@ app.use(express.json());
 
 
 
-
+//welcome page
 app.get('/', (req, res) => {
     res.send('benvenuti nella WebApp!');
 });
+
+//movies
+app.use('/api/movies', moviesRouter);
 
 
 
