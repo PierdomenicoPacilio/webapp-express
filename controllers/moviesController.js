@@ -12,7 +12,10 @@ function index(req, res) {
             });
         };
 
-        res.json(results);
+        res.json(results.map(result => ({
+            ...result,
+            imagePath: "http://127.0.0.1:3000/movies/" + result.image
+        })));
     });
 };
 
@@ -33,7 +36,33 @@ function show(req, res) {
                 errorMessage: "No records found"
             });
         };
-        res.json(results[0]);
+
+
+        const currentResult = results[0];
+
+        const movie = {
+            ...currentResult,
+            imagePath: "http://127.0.0.1:3000/movies/" + results.image
+        }
+
+
+        //recensioni
+
+        const sql = "SELECT * FROM reviews WHERE movie_id = ?";
+
+        connection.query(sql, [id], (err, results) => {
+
+            if (err) {
+                console.log(err)
+            }
+
+            movie.reviews = results;
+
+            res.json(movie);
+        });
+
+
+
     });
 };
 
