@@ -3,7 +3,27 @@ const connection = require('../data/db');
 
 function index(req, res) {
 
-    const sql = 'SELECT * FROM movies;';
+    const { search } = req.query;
+
+    let sql = `
+    SELECT 
+        movies.*, ROUND(AVG(reviews.vote), 1) AS reviews_vote
+    FROM 
+        movies 
+    LEFT JOIN 
+        reviews ON movies.id = reviews.movie_id
+    `;
+    if (search) {
+        sql += `
+    WHERE 
+        title LIKE "%${search}%" or director LIKE "%${search}%" or abstract LIKE "%${search}%"
+    `;
+    }
+    sql += `
+    GROUP BY 
+        movies.id;
+    `;
+
 
     connection.query(sql, (err, results) => {
         if (err) {
@@ -14,7 +34,7 @@ function index(req, res) {
 
         res.json(results.map(result => ({
             ...result,
-            imagePath: "http://127.0.0.1:3000/movies/" + result.image
+            imagePath: "http://127.0.0.1:3000/movies_cover/" + result.image
         })));
     });
 };
