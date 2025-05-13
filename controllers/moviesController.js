@@ -97,4 +97,11 @@ function show(req, res) {
     });
 };
 
-module.exports = { index, show };
+function storeReview(req, res) {
+
+    const { id } = req.params;
+
+    res.send('ho aggiunto una nuova recensione per il film ' + id)
+}
+
+module.exports = { index, show, storeReview };
