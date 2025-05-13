@@ -5,6 +5,8 @@ function index(req, res) {
 
     const { search } = req.query;
 
+    const preparedParams = [];
+
     let sql = `
     SELECT 
         movies.*, ROUND(AVG(reviews.vote), 1) AS reviews_vote
@@ -16,8 +18,8 @@ function index(req, res) {
     if (search) {
         sql += `
     WHERE 
-        title LIKE "%${search}%" or director LIKE "%${search}%" or abstract LIKE "%${search}%"
-    `;
+        title LIKE ? or director LIKE ? or abstract LIKE ?`;
+        preparedParams.push(`%${search}%`, `%${search}%`, `%${search}%`)
     }
     sql += `
     GROUP BY 
@@ -25,7 +27,7 @@ function index(req, res) {
     `;
 
 
-    connection.query(sql, (err, results) => {
+    connection.query(sql, preparedParams, (err, results) => {
         if (err) {
             return res.status(500).json({
                 errorMessage: "Database connection error"
@@ -62,7 +64,7 @@ function show(req, res) {
 
         const movie = {
             ...currentResult,
-            imagePath: "http://127.0.0.1:3000/movies/" + results.image
+            imagePath: "http://127.0.0.1:3000/movies_cover/" + currentResult.image
         }
 
 
