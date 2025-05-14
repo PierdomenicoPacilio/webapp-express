@@ -101,7 +101,42 @@ function storeReview(req, res) {
 
     const { id } = req.params;
 
-    res.send('ho aggiunto una nuova recensione per il film ' + id)
-}
+    const { name, vote, text } = req.body;
 
-module.exports = { index, show, storeReview };
+    const sql = `INSERT INTO reviews (movie_id, name, vote, text)
+                VALUES ( ?, ?, ?, ? );`;
+
+    connection.query(sql, [id, name, vote, text], (err, results) => {
+        if (err) {
+            console.log(err);
+        };
+    });
+
+    res.status(201);
+    res.json({
+        id,
+        name,
+        vote,
+        text
+    });
+};
+
+function store(req, res) {
+
+    const { title, director, genre, release_year, abstract, slug } = req.body;
+
+    const imageName = req.file.filename;
+
+    const sql = `INSERT INTO movies (title, director, genre, release_year, abstract, image, slug)
+                VALUES ( ?, ?, ?, ?, ?, ?, ? );`;
+    connection.query(sql, [title, director, genre, release_year, abstract, imageName, slug], (err, results) => {
+        if (err) {
+            console.log(err);
+        };
+    });
+
+    res.status(201);
+    res.send({ message: 'aggiunta nuovo libro' })
+};
+
+module.exports = { index, show, store, storeReview };
